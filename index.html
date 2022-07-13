@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      //     Чтоб не терять сноровку и лучше разобраться с итераторами - попробуете
+      //      повторить реализацию итератора для перебора списка фильмов, который мы с
+      //      вами реализовывали. Но чтоб было интереснее - изначально создайте список
+      //      фильмов - массив объектов с полями (название, жанр, год), создайте конструктор,
+      //      который будет принимать этот массив и превращать его в объект, где ключами будут
+      //      жанры, а значением список объектов-фильмов и добавлять итератор, который будет выводить
+      //      все фильмы без повторений при переборе.
+
+      //   *Для тех, кому этого мало - сделайте поле "жанр" у каждого фильма - массивом
+
+      const films = [
+        {
+          name: "Back to the future",
+          category: ["fantasy", "comedy", "adventure"],
+          year: 1985,
+        },
+        {
+          name: "Titanic",
+          category: ["drama"],
+          year: 1991,
+        },
+        {
+          name: "Green mile",
+          category: ["drama", "fantasy"],
+          year: 1999,
+        },
+      ];
+
+      function GroupFilmsByCategory(films) {
+        this.groupedFilms = films.reduce((filmsList, film) => {
+          const categories = film["category"];
+
+          categories.forEach((category) => {
+            if (!filmsList[category]) {
+              filmsList[category] = [];
+            }
+            filmsList[category].push(film);
+          });
+
+          return filmsList;
+        }, {});
+
+        this.groupedFilms[Symbol.iterator] = function () {
+          const values = Object.values(this).flat();
+          const uniqueValues = values.reduce((filmsList, film) => {
+            if (!filmsList.includes(film)) {
+              filmsList.push(film);
+            }
+
+            return filmsList;
+          }, []);
+
+          let valueIndex = 0;
+
+          return {
+            next() {
+              if (valueIndex === uniqueValues.length) {
+                return { done: true };
+              }
+
+              return {
+                done: false,
+                value: uniqueValues[valueIndex++],
+              };
+            },
+          };
+        };
+
+        return this.groupedFilms;
+      }
+
+      const groupedFilmsByCategory = new GroupFilmsByCategory(films);
+
+      console.log("groupedFilmsByCategory: ", groupedFilmsByCategory);
+
+      for (const film of groupedFilmsByCategory) {
+        console.log("film: ", film);
+      }
+    </script>
+  </body>
+</html>
